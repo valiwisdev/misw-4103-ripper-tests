@@ -1,7 +1,7 @@
 {
   "url": "http://localhost:3001/ghost",
   "headless": false,
-  "depthLevels": 1,
+  "depthLevels": 2,
   "inputValues": true,
   "values": {
     "blog-title": "Valiwis Dev",
@@ -9,7 +9,9 @@
     "password": "ValeriaPass22#",
     "email": "valeria@email.com",
     "ember6": "valeria@email.com",
-    "ember8": "ValeriaPass22#"
+    "ember8": "ValeriaPass22#",
+    "ember57": "My new post",
+    "ember58": "Hello world! This is my first post."
   },
   "browsers": ["chromium"]
 }

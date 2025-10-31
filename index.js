@@ -495,6 +495,10 @@ async function interactWithObject(
         beforeInteraction
       );
 
+      // Close search modal if present
+      await page.keyboard.press('Escape').catch(() => {});
+      await page.waitForTimeout(500);
+      
       await elementHandle.hover().catch((e) => {
         console.log("Could not hover to element");
       });
