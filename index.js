@@ -254,6 +254,10 @@ async function addListeners(page) {
     console.log(dialog.message());
     dialog.dismiss();
   });
+
+  page.on('filechooser', async () => {
+    console.log('File chooser dialog detected, ignoring...');
+  });
 }
 
 //Function to clean the directories that are going to be used during executions.
@@ -455,6 +459,7 @@ async function interactWithObject(
     ) {
       await elementHandle.hover().catch((e) => {
         console.log("Could not hover to element");
+        console.log(e);
       });
       //Fill inputs with either random values or with the values indicated in the config file
       if (inputValuesFlag) {
@@ -501,9 +506,11 @@ async function interactWithObject(
       
       await elementHandle.hover().catch((e) => {
         console.log("Could not hover to element");
+        console.log(e);
       });
       await elementHandle.click().catch((e) => {
         console.log("unclickable element");
+        console.log(e);
       });
       await page.waitForTimeout(3000);
       let html = await getDOM(page);
