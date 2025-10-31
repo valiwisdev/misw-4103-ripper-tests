@@ -1,14 +1,15 @@
 {
-  "url": "https://thesoftwaredesignlab.github.io",
-  "headless": true,
+  "url": "http://localhost:3001/ghost",
+  "headless": false,
   "depthLevels": 1,
-  "inputValues": false,
+  "inputValues": true,
   "values": {
-    "userInput": "Mario",
-    "passwordInput": "123456",
-    "passwordTwoInput": "123456",
-    "nameInput": "Mario",
-    "emailInput": "mario@b.com"
+    "blog-title": "Valiwis Dev",
+    "name": "Valeria",
+    "password": "ValeriaPass22#",
+    "email": "valeria@email.com",
+    "ember6": "valeria@email.com",
+    "ember8": "ValeriaPass22#"
   },
-  "browsers": ["chromium", "webkit", "firefox"]
+  "browsers": ["chromium"]
 }

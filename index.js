@@ -388,10 +388,10 @@ async function getTextInputs(page, elementList) {
 }
 //Method to obtain the buttons of the page and push them to the list in the params.
 async function getButtons(page, elementList) {
-  let buttons = await page.$$("button");
+  let buttons = await page.$$("button, input[type='submit']");
   let button;
   for (let i = 0; i < buttons.length; i++) {
-    let disabled = page.evaluate((btn) => {
+    let disabled = await page.evaluate((btn) => {
       return (
         typeof btn.getAttribute("disabled") === "string" ||
         btn.getAttribute("aria-disabled") === "true"
@@ -501,6 +501,7 @@ async function interactWithObject(
       await elementHandle.click().catch((e) => {
         console.log("unclickable element");
       });
+      await page.waitForTimeout(3000);
       let html = await getDOM(page);
       if (!!html) {
         let parsedHtml = parser.parse(html);
