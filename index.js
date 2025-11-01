@@ -194,6 +194,8 @@ async function recursiveExploration(page, link, depth, parentState) {
       await getTextInputs(page, elementList);
       await getButtons(page, elementList);
       await getDropdowns(page, elementList);
+      await getTextareas(page, elementList);
+      await getArticles(page, elementList);
       //Interact with the elements
       await interactWithObjects(elementList, page, currentState, link);
 
@@ -401,7 +403,11 @@ async function getButtons(page, elementList) {
         btn.getAttribute("aria-disabled") === "true"
       );
     }, buttons[i]);
-    if (!disabled) {
+    
+    let className = await page.evaluate((btn) => btn.className, buttons[i]);
+    let shouldIgnore = className.includes("dib dim-lite link h9 w9 nudge-top--1");
+    
+    if (!disabled && !shouldIgnore) {
       button = {
         type: "button",
         element: buttons[i],
@@ -422,6 +428,30 @@ async function getDropdowns(page, elementList) {
       url: page.url(),
     };
     elementList.push(select);
+  }
+}
+
+//Method to obtain textareas
+async function getTextareas(page, elementList) {
+  let textareas = await page.$$("textarea");
+  for (let i = 0; i < textareas.length; i++) {
+    elementList.push({
+      type: "textarea",
+      element: textareas[i],
+      url: page.url(),
+    });
+  }
+}
+
+//Method to obtain articles
+async function getArticles(page, elementList) {
+  let articles = await page.$$("article[contenteditable='true']");
+  for (let i = 0; i < articles.length; i++) {
+    elementList.push({
+      type: "article",
+      element: articles[i],
+      url: page.url(),
+    });
   }
 }
 
@@ -457,8 +487,21 @@ async function interactWithObject(
       location.width !== 0 &&
       location.height !== 0
     ) {
+
+
+      // get input element and console log all of its properties
+      let inputText = await page.evaluate((el) => el.innerText, elementHandle);
+      let inputId = await page.evaluate((el) => el.id, elementHandle);
+      let inputClass = await page.evaluate((el) => el.className, elementHandle);
+      console.log(`Input properties:
+        Text: ${inputText}
+        ID: ${inputId}
+        Class: ${inputClass}
+      `);
+
       await elementHandle.hover().catch((e) => {
         console.log("Could not hover to element");
+        console.log(`Input class: ${inputClass}`);
         console.log(e);
       });
       //Fill inputs with either random values or with the values indicated in the config file
@@ -503,13 +546,26 @@ async function interactWithObject(
       // Close search modal if present
       await page.keyboard.press('Escape').catch(() => {});
       await page.waitForTimeout(500);
-      
+
+      // get button element properties and console log all of them
+      let buttonText = await page.evaluate((el) => el.innerText, elementHandle);
+      let buttonId = await page.evaluate((el) => el.id, elementHandle);
+      let buttonClass = await page.evaluate((el) => el.className, elementHandle);
+      console.log(`Button properties:
+        Text: ${buttonText}
+        ID: ${buttonId}
+        Class: ${buttonClass}
+      `);
+
       await elementHandle.hover().catch((e) => {
         console.log("Could not hover to element");
+        console.log(`Button class: ${buttonClass}`);
         console.log(e);
+        
       });
       await elementHandle.click().catch((e) => {
         console.log("unclickable element");
+        console.log(`Button class: ${buttonClass}`);
         console.log(e);
       });
       await page.waitForTimeout(3000);
@@ -630,6 +686,19 @@ async function interactWithObject(
         }
       }
     }
+  } else if (object.type === "textarea" || object.type === "article") {
+    let elementHandle = object.element;
+    let location = await getCoordinates(elementHandle, page);
+    if (
+      location.x !== 0 &&
+      location.y !== 0 &&
+      location.width !== 0 &&
+      location.height !== 0
+    ) {
+      await elementHandle.hover().catch(() => {});
+      await elementHandle.click().catch(() => {});
+      await page.keyboard.type(faker.lorem.paragraphs(2));
+    }
   }
 }
 //Method to get the coordinates of a single element.
@@ -734,29 +803,33 @@ async function fillInput(elementHandle, page) {
       return;
     }
 
-    let type = await page.evaluate((el) => {
-      return el.type;
+    let elementInfo = await page.evaluate((el) => {
+      return {
+        type: el.type,
+        tagName: el.tagName.toLowerCase(),
+        contentEditable: el.contentEditable
+      };
     }, elementHandle);
     
-    if (type === "text") {
+    if (elementInfo.type === "text") {
       await elementHandle.click();
       await page.keyboard.type(faker.lorem.words());
-    } else if (type === "search") {
+    } else if (elementInfo.type === "search") {
       await elementHandle.click();
       await page.keyboard.type(faker.string.alphanumeric());
-    } else if (type === "password") {
+    } else if (elementInfo.type === "password") {
       await elementHandle.click();
       await page.keyboard.type(faker.internet.password());
-    } else if (type === "email") {
+    } else if (elementInfo.type === "email") {
       await elementHandle.click();
       await page.keyboard.type(faker.internet.email());
-    } else if (type === "tel") {
+    } else if (elementInfo.type === "tel") {
       await elementHandle.click();
       await page.keyboard.type(faker.phone.number());
-    } else if (type === "number") {
+    } else if (elementInfo.type === "number") {
       await elementHandle.click();
       await page.keyboard.type(faker.number.int().toString());
-    } else if (type === "submit" || type === "radio" || type === "checkbox") {
+    } else if (elementInfo.type === "submit" || elementInfo.type === "radio" || elementInfo.type === "checkbox") {
       await elementHandle.click();
     }
   } catch (error) {

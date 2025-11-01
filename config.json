@@ -10,8 +10,12 @@
     "email": "valeria@email.com",
     "ember6": "valeria@email.com",
     "ember8": "ValeriaPass22#",
-    "ember57": "My new post",
-    "ember58": "Hello world! This is my first post."
+    "member-name": "John Doe A",
+    "member-email": "john.doe1@example.com",
+    "member-note": "This is a note for John Doe.",
+    "tag-name": "Technology",
+    "tag-slug": "tech", 
+    "tag-description": "All about the latest in technology."
   },
   "browsers": ["chromium"]
 }
